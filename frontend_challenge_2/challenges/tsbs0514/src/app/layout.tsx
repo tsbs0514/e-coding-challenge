@@ -17,23 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>
-        {children}
-        {/* MSW初期化（開発環境のみ） */}
-        {process.env.NODE_ENV === "development" && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                if (typeof window !== 'undefined') {
-                  import('/mocks/browser.js').then(({ worker }) => {
-                    worker.start();
-                  }).catch(console.error);
-                }
-              `,
-            }}
-          />
-        )}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
