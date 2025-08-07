@@ -38,6 +38,7 @@ jobs:
         with:
           node-version: "20"
           cache: "npm"
+          cache-dependency-path: "frontend_challenge_2/challenges/tsbs0514/package-lock.json"
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
