@@ -7,9 +7,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true, // For static export
   },
-  // If deploying to a subdirectory, uncomment and adjust basePath and assetPrefix
-  // basePath: '/e-coding-challenge',
-  // assetPrefix: '/e-coding-challenge/',
+  // GitHub Pages subdirectory deployment
+  basePath: "/e-coding-challenge",
+  assetPrefix: "/e-coding-challenge/",
 };
 
 export default nextConfig;

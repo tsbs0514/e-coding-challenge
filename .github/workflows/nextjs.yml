@@ -45,6 +45,8 @@ jobs:
           # Automatically inject basePath in your Next.js configuration file and disable
           # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
           static_site_generator: next
+          # GitHub Pages subdirectory deployment
+          base_path: "/e-coding-challenge"
 
       - name: Restore cache
         uses: actions/cache@v4
@@ -81,6 +83,14 @@ jobs:
       - name: Build with Next.js
         working-directory: frontend_challenge_2/challenges/tsbs0514
         run: npm run build
+
+      - name: Debug build output
+        working-directory: frontend_challenge_2/challenges/tsbs0514
+        run: |
+          echo "Build output directory contents:"
+          ls -la out/
+          echo "Checking for index.html:"
+          find out/ -name "index.html" -type f
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
