@@ -1,4 +1,5 @@
 import { AreaCheckResponse } from "@/types";
+import { checkAreaLogic } from "./areaCheck";
 
 /**
  * 郵便番号からエリア判定
@@ -9,7 +10,7 @@ export async function checkArea(
 ): Promise<AreaCheckResponse> {
   // 開発環境ではMSWを使用、本番環境ではクライアントサイドで判定
   if (process.env.NODE_ENV === "development") {
-    const response = await fetch("/api/area-check", {
+    const response = await fetch("/e-coding-challenge/api/area-check", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,28 +25,6 @@ export async function checkArea(
     return response.json();
   } else {
     // 本番環境（静的エクスポート）ではクライアントサイドで判定
-    const firstDigit = postalCode.charAt(0);
-
-    let area: "tokyo" | "kansai" | "out-of-service" = "out-of-service";
-    let isValid = false;
-    let message = "";
-
-    if (firstDigit === "1") {
-      area = "tokyo";
-      isValid = true;
-    } else if (firstDigit === "5") {
-      area = "kansai";
-      isValid = true;
-    } else {
-      area = "out-of-service";
-      isValid = false;
-      message = "サービスエリア対象外です。";
-    }
-
-    return {
-      area,
-      isValid,
-      message,
-    };
+    return checkAreaLogic(postalCode);
   }
 }
