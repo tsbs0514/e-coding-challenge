@@ -75,4 +75,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/configure-pages@v4
+        with:
+          static_site_generator: next
+          generator_config_file: next.config.mjs
