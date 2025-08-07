@@ -41,6 +41,10 @@ jobs:
         working-directory: frontend_challenge_2/challenges/tsbs0514
         run: npm ci
 
+      - name: Install Playwright browsers
+        working-directory: frontend_challenge_2/challenges/tsbs0514
+        run: npx playwright install --with-deps
+
       - name: Run tests
         working-directory: frontend_challenge_2/challenges/tsbs0514
         run: npm test
@@ -48,6 +52,9 @@ jobs:
       - name: Run E2E tests
         working-directory: frontend_challenge_2/challenges/tsbs0514
         run: npm run test:e2e
+        env:
+          CI: true
+        timeout-minutes: 10
 
       - name: Build application
         working-directory: frontend_challenge_2/challenges/tsbs0514
