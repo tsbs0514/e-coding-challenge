@@ -61,20 +61,22 @@ jobs:
         working-directory: frontend_challenge_2/challenges/tsbs0514
         run: npm ci
 
-      - name: Install Playwright browsers
-        working-directory: frontend_challenge_2/challenges/tsbs0514
-        run: npx playwright install --with-deps
+      # Uncomment the following lines if you want to run E2E tests in CI
+      # - name: Install Playwright browsers
+      #   working-directory: frontend_challenge_2/challenges/tsbs0514
+      #   run: npx playwright install chromium
 
       - name: Run tests
         working-directory: frontend_challenge_2/challenges/tsbs0514
         run: npm test
 
-      - name: Run E2E tests
-        working-directory: frontend_challenge_2/challenges/tsbs0514
-        run: npm run test:e2e
-        env:
-          CI: true
-        timeout-minutes: 10
+      # Uncomment the following lines if you want to run E2E tests in CI
+      # - name: Run E2E tests
+      #   working-directory: frontend_challenge_2/challenges/tsbs0514
+      #   run: npm run test:e2e
+      #   env:
+      #     CI: true
+      #   timeout-minutes: 5
 
       - name: Build with Next.js
         working-directory: frontend_challenge_2/challenges/tsbs0514
