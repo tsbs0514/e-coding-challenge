@@ -66,6 +66,18 @@ test.describe("電気料金シミュレーションフォーム", () => {
     ).toBeVisible();
 
     await expect(page.getByLabel("電力会社")).toBeVisible();
+
+    const tokyoOptions = page.locator(
+      'select[name="powerCompany"] option:not([hidden])'
+    );
+    await expect(tokyoOptions).toHaveCount(2);
+    await expect(tokyoOptions.nth(0)).toHaveText("東京電力");
+    await expect(tokyoOptions.nth(1)).toHaveText("その他");
+    await expect(
+      page.locator(
+        'select[name="powerCompany"] option[value="kansai-electric"]'
+      )
+    ).toHaveCount(0);
     await page.selectOption('select[name="powerCompany"]', "tokyo-electric");
 
     await expect(page.getByLabel("プラン")).toBeVisible();
@@ -86,6 +98,16 @@ test.describe("電気料金シミュレーションフォーム", () => {
     ).toBeVisible();
 
     await expect(page.getByLabel("電力会社")).toBeVisible();
+
+    const kansaiOptions = page.locator(
+      'select[name="powerCompany"] option:not([hidden])'
+    );
+    await expect(kansaiOptions).toHaveCount(2);
+    await expect(kansaiOptions.nth(0)).toHaveText("関西電力");
+    await expect(kansaiOptions.nth(1)).toHaveText("その他");
+    await expect(
+      page.locator('select[name="powerCompany"] option[value="tokyo-electric"]')
+    ).toHaveCount(0);
     await page.selectOption('select[name="powerCompany"]', "kansai-electric");
 
     await expect(page.getByLabel("プラン")).toBeVisible();
@@ -426,4 +448,6 @@ test.describe("電気料金シミュレーションフォーム", () => {
       page.getByRole("heading", { name: "電気代から かんたんシミュレーション" })
     ).toBeVisible();
   });
+
+  // 上記の2テストへ統合したため、個別の選択肢検証テストは削除
 });
