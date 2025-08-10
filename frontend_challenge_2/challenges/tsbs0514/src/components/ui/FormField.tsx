@@ -7,6 +7,7 @@ interface FormFieldProps {
   error?: string;
   required?: boolean;
   children: React.ReactNode;
+  description?: string;
 }
 
 export function FormField({
@@ -15,6 +16,7 @@ export function FormField({
   error,
   required = false,
   children,
+  description,
 }: FormFieldProps) {
   return (
     <div className="flex flex-col gap-3 px-4">
@@ -29,7 +31,14 @@ export function FormField({
         )}
         {label}
       </label>
-      {children}
+      <div>
+        {children}
+        {description && (
+          <p className="text-xs bg-gray-200 pt-3 pb-2 px-2 -mt-1 rounded-b-sm">
+            {description}
+          </p>
+        )}
+      </div>
       {error && (
         <p
           className="p-2.5 flex text-xs items-center gap-2 bg-red-400 text-white rounded-sm font-bold"

@@ -166,7 +166,16 @@ export function ElectricSimulationForm({
 
               {/* プラン */}
               {watchedPowerCompany && !companyError && (
-                <FormField label="プラン" labelHtmlFor="plan" required>
+                <FormField
+                  label="プラン"
+                  labelHtmlFor="plan"
+                  required
+                  description={
+                    getAvailablePlans().find(
+                      (plan) => plan.value === watchedPlan
+                    )?.description
+                  }
+                >
                   <Select
                     {...register("plan")}
                     id="plan"

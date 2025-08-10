@@ -1,15 +1,17 @@
 import React from "react";
 import { cn } from "@/lib/utils";
+import type { ElectricPlan } from "@/types";
 import { FaChevronDown } from "react-icons/fa";
 
-export interface SelectOption {
-  value: string;
+export type SelectValue = string | ElectricPlan;
+export interface SelectOption<V extends SelectValue = string> {
+  value: V;
   label: string;
 }
 
-interface SelectProps
+interface SelectProps<V extends SelectValue = string>
   extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children"> {
-  options: SelectOption[];
+  options: ReadonlyArray<SelectOption<V>>;
   placeholder?: string;
   error?: boolean;
 }

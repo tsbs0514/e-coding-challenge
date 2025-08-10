@@ -5,7 +5,37 @@ import {
   electricSimulationFormSchema,
   ElectricSimulationFormData,
 } from "@/schemas";
-import { PowerArea, ContractCapacity } from "@/types";
+import { PowerArea, ContractCapacity, PlanOption } from "@/types";
+
+const TOKYO_PLANS: ReadonlyArray<PlanOption> = [
+  {
+    value: "tokyo-juryou-b",
+    label: "従量電灯B",
+    description:
+      "戸建・ファミリー向けの標準プラン。10A〜60Aの契約容量に応じた基本料金と、使用量に応じた従量料金で構成されます。夜間の使用が少ないご家庭におすすめです。",
+  },
+  {
+    value: "tokyo-juryou-c",
+    label: "従量電灯C",
+    description:
+      "高使用量世帯・小規模事業者向けのプラン。6〜49kVAで契約し、基本料金は契約kVAごとに設定されます。季節や時間帯による単価変動はなく通年で安定した料金設計です。",
+  },
+];
+
+const KANSAI_PLANS: ReadonlyArray<PlanOption> = [
+  {
+    value: "kansai-juryou-a",
+    label: "従量電灯A",
+    description:
+      "契約容量の設定が不要な標準プラン。使用量に応じて段階的に単価が変わります。ワンルームや電力使用が少なめの世帯に適しています。",
+  },
+  {
+    value: "kansai-juryou-b",
+    label: "従量電灯B",
+    description:
+      "高使用量世帯・業務利用向けのプラン。6〜49kVAで契約し、基本料金＋従量料金で構成されます。昼間の使用が多い場合に有利になるケースがあります。",
+  },
+];
 import { checkArea } from "@/lib/api";
 
 export function useElectricForm() {
@@ -105,18 +135,12 @@ export function useElectricForm() {
   }, [currentArea]);
 
   // 利用可能なプランを取得
-  const getAvailablePlans = useCallback(() => {
+  const getAvailablePlans = useCallback((): ReadonlyArray<PlanOption> => {
     if (!watchedPowerCompany || companyError) return [];
 
     return watchedPowerCompany === "tokyo-electric"
-      ? [
-          { value: "tokyo-juryou-b" as const, label: "従量電灯B" },
-          { value: "tokyo-juryou-c" as const, label: "従量電灯C" },
-        ]
-      : [
-          { value: "kansai-juryou-a" as const, label: "従量電灯A" },
-          { value: "kansai-juryou-b" as const, label: "従量電灯B" },
-        ];
+      ? TOKYO_PLANS
+      : KANSAI_PLANS;
   }, [watchedPowerCompany, companyError]);
 
   // 利用可能な契約容量を取得

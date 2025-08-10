@@ -13,6 +13,12 @@ export type ElectricPlan = z.infer<typeof electricPlanSchema>;
 
 export type ContractCapacity = z.infer<typeof contractCapacitySchema>;
 
+export interface PlanOption {
+  value: ElectricPlan;
+  label: string;
+  description: string;
+}
+
 export interface AreaCheckResponse {
   area: PowerArea;
   isValid: boolean;
