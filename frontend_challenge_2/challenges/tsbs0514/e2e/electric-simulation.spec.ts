@@ -372,8 +372,8 @@ test.describe("電気料金シミュレーションフォーム", () => {
     page.on("dialog", async (dialog) => {
       expect(dialog.message()).toContain("シミュレーション完了！");
       expect(dialog.message()).toContain("郵便番号: 123-4567");
-      expect(dialog.message()).toContain("電力会社: tokyo-electric");
-      expect(dialog.message()).toContain("プラン: tokyo-juryou-b");
+      expect(dialog.message()).toContain("電力会社: 東京電力");
+      expect(dialog.message()).toContain("プラン: 従量電灯B");
       expect(dialog.message()).toContain("契約容量: 30A");
       expect(dialog.message()).toContain("現在の電気代: 12,000円");
       await dialog.accept();
@@ -412,8 +412,8 @@ test.describe("電気料金シミュレーションフォーム", () => {
     page.on("dialog", async (dialog) => {
       expect(dialog.message()).toContain("シミュレーション完了！");
       expect(dialog.message()).toContain("郵便番号: 567-8901");
-      expect(dialog.message()).toContain("電力会社: kansai-electric");
-      expect(dialog.message()).toContain("プラン: kansai-juryou-a");
+      expect(dialog.message()).toContain("電力会社: 関西電力");
+      expect(dialog.message()).toContain("プラン: 従量電灯A");
       expect(dialog.message()).toContain("契約容量: なし");
       expect(dialog.message()).toContain("現在の電気代: 8,000円");
       await dialog.accept();

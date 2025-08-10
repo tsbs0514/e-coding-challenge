@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/Input";
 import { Select, SelectOption } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { ElectricSimulationFormData } from "@/schemas";
+import type { PowerCompany, ElectricPlan } from "@/types";
+import { POWER_COMPANY_LABELS, PLAN_LABELS } from "@/constants/options";
 import { Section } from "./layout/Section";
 import { FormField } from "./ui/FormField";
 import { FaCircleChevronRight } from "react-icons/fa6";
@@ -68,12 +70,19 @@ export function ElectricSimulationForm({
 
     setIsSubmitting(true);
     try {
+      const companyLabel =
+        POWER_COMPANY_LABELS[
+          (data.powerCompany as Exclude<PowerCompany, "">) || "other"
+        ] || data.powerCompany;
+
+      const planLabel =
+        PLAN_LABELS[data.plan as Exclude<ElectricPlan, "">] || data.plan;
       // シミュレーション成功のメッセージ表示
       alert(
         `シミュレーション完了！\n\n` +
           `郵便番号: ${data.postalCodeFirst}-${data.postalCodeSecond}\n` +
-          `電力会社: ${data.powerCompany}\n` +
-          `プラン: ${data.plan}\n` +
+          `電力会社: ${companyLabel}\n` +
+          `プラン: ${planLabel}\n` +
           `契約容量: ${data.contractCapacity || "なし"}\n` +
           `現在の電気代: ${data.currentElectricBill?.toLocaleString()}円`
       );

@@ -5,68 +5,17 @@ import {
   electricSimulationFormSchema,
   ElectricSimulationFormData,
 } from "@/schemas";
-import { PowerArea, ContractCapacity, PlanOption, ElectricPlan } from "@/types";
-
-const TOKYO_PLANS: ReadonlyArray<PlanOption> = [
-  {
-    value: "tokyo-juryou-b",
-    label: "従量電灯B",
-    description:
-      "戸建・ファミリー向けの標準プラン。10A〜60Aの契約容量に応じた基本料金と、使用量に応じた従量料金で構成されます。夜間の使用が少ないご家庭におすすめです。",
-  },
-  {
-    value: "tokyo-juryou-c",
-    label: "従量電灯C",
-    description:
-      "高使用量世帯・小規模事業者向けのプラン。6〜49kVAで契約し、基本料金は契約kVAごとに設定されます。季節や時間帯による単価変動はなく通年で安定した料金設計です。",
-  },
-];
-
-const KANSAI_PLANS: ReadonlyArray<PlanOption> = [
-  {
-    value: "kansai-juryou-a",
-    label: "従量電灯A",
-    description:
-      "契約容量の設定が不要な標準プラン。使用量に応じて段階的に単価が変わります。ワンルームや電力使用が少なめの世帯に適しています。",
-  },
-  {
-    value: "kansai-juryou-b",
-    label: "従量電灯B",
-    description:
-      "高使用量世帯・業務利用向けのプラン。6〜49kVAで契約し、基本料金＋従量料金で構成されます。昼間の使用が多い場合に有利になるケースがあります。",
-  },
-];
+import { PowerArea, PlanOption, ElectricPlan } from "@/types";
+import {
+  TOKYO_PLANS,
+  KANSAI_PLANS,
+  COMPANY_OPTIONS_BY_AREA,
+  PLAN_TO_CAPACITIES,
+  type CapacityOption,
+} from "@/constants/options";
 import { checkArea } from "@/lib/api";
 
-type CapacityOption = { value: ContractCapacity; label: string };
-
-const tokyoJuryouBOptions: CapacityOption[] = [
-  "10A",
-  "15A",
-  "20A",
-  "30A",
-  "40A",
-  "50A",
-  "60A",
-].map((amp) => ({ value: amp as ContractCapacity, label: amp }));
-
-const juryouCKansaiOptions: CapacityOption[] = Array.from(
-  { length: 44 },
-  (_, i) => {
-    const kva = i + 6;
-    const label = `${kva}kVA`;
-    return { value: label as ContractCapacity, label };
-  }
-);
-
-const PLAN_TO_CAPACITIES: Readonly<
-  Record<Exclude<ElectricPlan, "">, ReadonlyArray<CapacityOption>>
-> = {
-  "tokyo-juryou-b": tokyoJuryouBOptions,
-  "tokyo-juryou-c": juryouCKansaiOptions,
-  "kansai-juryou-a": [],
-  "kansai-juryou-b": juryouCKansaiOptions,
-} as const;
+// use Electric PLAN_TO_CAPACITIES from constants
 
 export function useElectricForm() {
   const [currentArea, setCurrentArea] = useState<PowerArea | null>(null);
@@ -153,15 +102,7 @@ export function useElectricForm() {
   const getAvailablePowerCompanies = useCallback(() => {
     if (!currentArea || currentArea === "out-of-service") return [];
 
-    return currentArea === "tokyo"
-      ? [
-          { value: "tokyo-electric" as const, label: "東京電力" },
-          { value: "other" as const, label: "その他" },
-        ]
-      : [
-          { value: "kansai-electric" as const, label: "関西電力" },
-          { value: "other" as const, label: "その他" },
-        ];
+    return COMPANY_OPTIONS_BY_AREA[currentArea];
   }, [currentArea]);
 
   // 利用可能なプランを取得
