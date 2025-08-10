@@ -5,7 +5,7 @@ import {
   electricSimulationFormSchema,
   ElectricSimulationFormData,
 } from "@/schemas";
-import { PowerArea, ContractCapacity, PlanOption } from "@/types";
+import { PowerArea, ContractCapacity, PlanOption, ElectricPlan } from "@/types";
 
 const TOKYO_PLANS: ReadonlyArray<PlanOption> = [
   {
@@ -37,6 +37,36 @@ const KANSAI_PLANS: ReadonlyArray<PlanOption> = [
   },
 ];
 import { checkArea } from "@/lib/api";
+
+type CapacityOption = { value: ContractCapacity; label: string };
+
+const tokyoJuryouBOptions: CapacityOption[] = [
+  "10A",
+  "15A",
+  "20A",
+  "30A",
+  "40A",
+  "50A",
+  "60A",
+].map((amp) => ({ value: amp as ContractCapacity, label: amp }));
+
+const juryouCKansaiOptions: CapacityOption[] = Array.from(
+  { length: 44 },
+  (_, i) => {
+    const kva = i + 6;
+    const label = `${kva}kVA`;
+    return { value: label as ContractCapacity, label };
+  }
+);
+
+const PLAN_TO_CAPACITIES: Readonly<
+  Record<Exclude<ElectricPlan, "">, ReadonlyArray<CapacityOption>>
+> = {
+  "tokyo-juryou-b": tokyoJuryouBOptions,
+  "tokyo-juryou-c": juryouCKansaiOptions,
+  "kansai-juryou-a": [],
+  "kansai-juryou-b": juryouCKansaiOptions,
+} as const;
 
 export function useElectricForm() {
   const [currentArea, setCurrentArea] = useState<PowerArea | null>(null);
@@ -144,32 +174,11 @@ export function useElectricForm() {
   }, [watchedPowerCompany, companyError]);
 
   // 利用可能な契約容量を取得
-  const getAvailableCapacities = useCallback(() => {
-    if (!watchedPlan) return [];
-
-    switch (watchedPlan) {
-      case "tokyo-juryou-b":
-        return [
-          { value: "10A" as const, label: "10A" },
-          { value: "15A" as const, label: "15A" },
-          { value: "20A" as const, label: "20A" },
-          { value: "30A" as const, label: "30A" },
-          { value: "40A" as const, label: "40A" },
-          { value: "50A" as const, label: "50A" },
-          { value: "60A" as const, label: "60A" },
-        ];
-      case "tokyo-juryou-c":
-      case "kansai-juryou-b":
-        return Array.from({ length: 44 }, (_, i) => {
-          const kva = i + 6;
-          return { value: `${kva}kVA` as ContractCapacity, label: `${kva}kVA` };
-        });
-      case "kansai-juryou-a":
-        return []; // 契約容量不要
-      default:
-        return [];
-    }
-  }, [watchedPlan]);
+  const getAvailableCapacities =
+    useCallback((): ReadonlyArray<CapacityOption> => {
+      if (!watchedPlan) return [];
+      return PLAN_TO_CAPACITIES[watchedPlan as Exclude<ElectricPlan, "">] ?? [];
+    }, [watchedPlan]);
 
   // 契約容量が必要かどうか
   const isContractCapacityRequired = useCallback(() => {
