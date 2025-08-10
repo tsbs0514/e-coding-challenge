@@ -11,25 +11,14 @@ export function checkAreaLogic(postalCode: string): {
 } {
   const firstDigit = postalCode.charAt(0);
 
-  let area: PowerArea = "out-of-service";
-  let isValid = false;
-  let message = "";
-
-  if (firstDigit === "1") {
-    area = "tokyo";
-    isValid = true;
-  } else if (firstDigit === "5") {
-    area = "kansai";
-    isValid = true;
-  } else {
-    area = "out-of-service";
-    isValid = false;
-    message = "サービスエリア対象外です。";
-  }
-
-  return {
-    area,
-    isValid,
-    message,
+  const areaMap: Record<string, PowerArea> = {
+    "1": "tokyo",
+    "5": "kansai",
   };
+
+  const area = areaMap[firstDigit] ?? "out-of-service";
+  const isValid = area !== "out-of-service";
+  const message = isValid ? "" : "サービスエリア対象外です。";
+
+  return { area, isValid, message };
 }
