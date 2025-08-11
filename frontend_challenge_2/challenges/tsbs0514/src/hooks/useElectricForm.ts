@@ -1,17 +1,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import {
   electricSimulationFormSchema,
   ElectricSimulationFormData,
 } from "@/schemas";
-import { PowerArea, PlanOption, ElectricPlan } from "@/types";
+import { PowerArea, PlanOption, ElectricPlan, PowerCompany } from "@/types";
 import {
   TOKYO_PLANS,
   KANSAI_PLANS,
   COMPANY_OPTIONS_BY_AREA,
   PLAN_TO_CAPACITIES,
   type CapacityOption,
+  POWER_COMPANY_LABELS,
+  PLAN_LABELS,
 } from "@/constants/options";
 import { checkArea } from "@/lib/api";
 
@@ -37,7 +39,7 @@ export function useElectricForm() {
     },
   });
 
-  const { watch, clearErrors, resetField } = form;
+  const { watch, clearErrors, resetField, setFocus } = form;
 
   const watchedPostalCodeFirst = watch("postalCodeFirst");
   const watchedPostalCodeSecond = watch("postalCodeSecond");
@@ -126,12 +128,62 @@ export function useElectricForm() {
     return watchedPlan && watchedPlan !== "kansai-juryou-a";
   }, [watchedPlan]);
 
+  // プランの表示/非表示
+  const isPlanVisible = useMemo(() => {
+    return Boolean(watchedPowerCompany) && !companyError;
+  }, [watchedPowerCompany, companyError]);
+
+  // 契約容量の表示/非表示
+  const isCapacityVisible = useMemo(() => {
+    return Boolean(watchedPlan) && watchedPlan !== "kansai-juryou-a";
+  }, [watchedPlan]);
+
+  // 選択されたプランの情報
+  const selectedPlanOption = useMemo(() => {
+    if (!watchedPlan) return undefined;
+    const plans = getAvailablePlans();
+    return plans.find((p) => p.value === watchedPlan);
+  }, [watchedPlan, getAvailablePlans]);
+
+  // プランの説明文
+  const planDescription = selectedPlanOption?.description || "";
+
+  // 電力会社のラベル
+  const companyLabel = useMemo(() => {
+    return watchedPowerCompany
+      ? POWER_COMPANY_LABELS[
+          (watchedPowerCompany as Exclude<PowerCompany, "">) || "other"
+        ] || watchedPowerCompany
+      : "";
+  }, [watchedPowerCompany]);
+
+  // プランのラベル
+  const planLabel = useMemo(() => {
+    return watchedPlan
+      ? PLAN_LABELS[watchedPlan as Exclude<ElectricPlan, "">] || watchedPlan
+      : "";
+  }, [watchedPlan]);
+
+  // 詳細情報セクションの表示/非表示
+  const isDetailsSectionVisible = useMemo(() => {
+    return (
+      Boolean(watchedPlan) && !!currentArea && currentArea !== "out-of-service"
+    );
+  }, [watchedPlan, currentArea]);
+
   // 郵便番号の監視
   useEffect(() => {
     if (watchedPostalCodeFirst && watchedPostalCodeSecond) {
       handlePostalCodeChange(watchedPostalCodeFirst, watchedPostalCodeSecond);
     }
   }, [watchedPostalCodeFirst, watchedPostalCodeSecond, handlePostalCodeChange]);
+
+  // 郵便番号前半3桁入力で後半へ自動フォーカス
+  useEffect(() => {
+    if (watchedPostalCodeFirst && watchedPostalCodeFirst.length === 3) {
+      setFocus("postalCodeSecond");
+    }
+  }, [watchedPostalCodeFirst, setFocus]);
 
   // 電力会社の監視
   useEffect(() => {
@@ -152,6 +204,13 @@ export function useElectricForm() {
     areaError,
     companyError,
     isSubmitting,
+    isPlanVisible,
+    isCapacityVisible,
+    selectedPlanOption,
+    planDescription,
+    companyLabel,
+    planLabel,
+    isDetailsSectionVisible,
     setIsSubmitting,
     getAvailablePowerCompanies,
     getAvailablePlans,

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { useElectricForm } from "@/hooks/useElectricForm";
 
 import { Input } from "@/components/ui/Input";
@@ -26,31 +26,21 @@ export function ElectricSimulationForm({
     areaError,
     companyError,
     isSubmitting,
+    isPlanVisible,
+    isCapacityVisible,
+    planDescription,
+    isDetailsSectionVisible,
     setIsSubmitting,
     getAvailablePowerCompanies,
     getAvailablePlans,
     getAvailableCapacities,
-    isContractCapacityRequired,
   } = useElectricForm();
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
-    watch,
-    setFocus,
   } = form;
-
-  const watchedPowerCompany = watch("powerCompany");
-  const watchedPlan = watch("plan");
-  const watchedPostalCodeFirst = watch("postalCodeFirst");
-
-  // 3桁入力されたら次のフィールドにフォーカス
-  useEffect(() => {
-    if (watchedPostalCodeFirst && watchedPostalCodeFirst.length === 3) {
-      setFocus("postalCodeSecond");
-    }
-  }, [setFocus, watchedPostalCodeFirst]);
 
   const handleFormSubmit = async (data: ElectricSimulationFormData) => {
     if (areaError || companyError) return;
@@ -174,16 +164,12 @@ export function ElectricSimulationForm({
               </FormField>
 
               {/* プラン */}
-              {watchedPowerCompany && !companyError && (
+              {isPlanVisible && (
                 <FormField
                   label="プラン"
                   labelHtmlFor="plan"
                   required
-                  description={
-                    getAvailablePlans().find(
-                      (plan) => plan.value === watchedPlan
-                    )?.description
-                  }
+                  description={planDescription}
                 >
                   <Select
                     {...register("plan")}
@@ -197,7 +183,7 @@ export function ElectricSimulationForm({
               )}
 
               {/* 契約容量 */}
-              {watchedPlan && isContractCapacityRequired() && (
+              {isCapacityVisible && (
                 <FormField
                   label="契約容量"
                   labelHtmlFor="contractCapacity"
@@ -218,7 +204,7 @@ export function ElectricSimulationForm({
         )}
 
         {/* 現在の電気代・ユーザー情報セクション & 送信ボタン */}
-        {watchedPlan && currentArea && currentArea !== "out-of-service" && (
+        {isDetailsSectionVisible && (
           <>
             {/* 現在の電気代 */}
             <Section title="現在の電気の使用状況について教えてください">
