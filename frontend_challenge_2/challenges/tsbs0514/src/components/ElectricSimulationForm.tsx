@@ -30,6 +30,7 @@ export function ElectricSimulationForm({
     isCapacityVisible,
     planDescription,
     isDetailsSectionVisible,
+    capacityPromptError,
     setIsSubmitting,
     getAvailablePowerCompanies,
     getAvailablePlans,
@@ -188,6 +189,9 @@ export function ElectricSimulationForm({
                   label="契約容量"
                   labelHtmlFor="contractCapacity"
                   required
+                  error={
+                    capacityPromptError || errors.contractCapacity?.message
+                  }
                 >
                   <Select
                     {...register("contractCapacity")}

@@ -479,7 +479,7 @@ describe("useElectricFormフック", () => {
         });
 
         await waitFor(() => {
-          expect(result.current.isContractCapacityRequired()).toBe(true);
+          expect(result.current.isContractCapacityRequired).toBe(true);
         });
       });
 
@@ -512,7 +512,7 @@ describe("useElectricFormフック", () => {
         });
 
         await waitFor(() => {
-          expect(result.current.isContractCapacityRequired()).toBe(false);
+          expect(result.current.isContractCapacityRequired).toBe(false);
         });
       });
     });
@@ -535,6 +535,135 @@ describe("useElectricFormフック", () => {
       });
 
       expect(result.current.isSubmitting).toBe(false);
+    });
+  });
+
+  describe("派生値", () => {
+    it("isPlanVisible は電力会社選択済みかつエラーなしで true", async () => {
+      const { result } = renderHook(() => useElectricForm());
+
+      // エリアチェックを完了（東京）
+      act(() => {
+        result.current.form.setValue("postalCodeFirst", "130");
+        result.current.form.setValue("postalCodeSecond", "0012");
+      });
+
+      await waitFor(() => {
+        expect(result.current.currentArea).toBe("tokyo");
+      });
+
+      // 電力会社を選択
+      act(() => {
+        result.current.form.setValue("powerCompany", "tokyo-electric");
+      });
+
+      await waitFor(() => {
+        expect(result.current.isPlanVisible).toBe(true);
+      });
+    });
+
+    it("isCapacityVisible はプランが 'kansai-juryou-a' 以外で true", async () => {
+      mockCheckArea.mockResolvedValue({
+        area: "kansai",
+        isValid: true,
+        message: "",
+      });
+      const { result } = renderHook(() => useElectricForm());
+
+      act(() => {
+        result.current.form.setValue("postalCodeFirst", "567");
+        result.current.form.setValue("postalCodeSecond", "8901");
+      });
+
+      await waitFor(() => {
+        expect(result.current.currentArea).toBe("kansai");
+      });
+
+      act(() => {
+        result.current.form.setValue("powerCompany", "kansai-electric");
+      });
+
+      // kansai-juryou-a は容量不要
+      act(() => {
+        result.current.form.setValue("plan", "kansai-juryou-a");
+      });
+      await waitFor(() => {
+        expect(result.current.isCapacityVisible).toBe(false);
+      });
+
+      // kansai-juryou-b は容量必要
+      act(() => {
+        result.current.form.setValue("plan", "kansai-juryou-b");
+      });
+      await waitFor(() => {
+        expect(result.current.isCapacityVisible).toBe(true);
+      });
+    });
+
+    it("planDescription は選択プランの説明文を返す", async () => {
+      const { result } = renderHook(() => useElectricForm());
+
+      act(() => {
+        result.current.form.setValue("postalCodeFirst", "130");
+        result.current.form.setValue("postalCodeSecond", "0012");
+      });
+      await waitFor(() => {
+        expect(result.current.currentArea).toBe("tokyo");
+      });
+
+      act(() => {
+        result.current.form.setValue("powerCompany", "tokyo-electric");
+        result.current.form.setValue("plan", "tokyo-juryou-b");
+      });
+
+      await waitFor(() => {
+        expect(result.current.planDescription).toContain(
+          "戸建・ファミリー向けの標準プラン。10A〜60Aの契約容量に応じた基本料金と、使用量に応じた従量料金で構成されます。夜間の使用が少ないご家庭におすすめです。"
+        );
+      });
+    });
+
+    it("companyLabel / planLabel は正式名称に変換される", async () => {
+      const { result } = renderHook(() => useElectricForm());
+
+      act(() => {
+        result.current.form.setValue("postalCodeFirst", "130");
+        result.current.form.setValue("postalCodeSecond", "0012");
+      });
+      await waitFor(() => {
+        expect(result.current.currentArea).toBe("tokyo");
+      });
+
+      act(() => {
+        result.current.form.setValue("powerCompany", "tokyo-electric");
+        result.current.form.setValue("plan", "tokyo-juryou-b");
+      });
+
+      await waitFor(() => {
+        expect(result.current.companyLabel).toBe("東京電力");
+        expect(result.current.planLabel).toBe("従量電灯B");
+      });
+    });
+
+    it("isDetailsSectionVisible はエリア有効かつプラン選択済みで true", async () => {
+      const { result } = renderHook(() => useElectricForm());
+
+      act(() => {
+        result.current.form.setValue("postalCodeFirst", "130");
+        result.current.form.setValue("postalCodeSecond", "0012");
+      });
+      await waitFor(() => {
+        expect(result.current.currentArea).toBe("tokyo");
+      });
+
+      act(() => {
+        result.current.form.setValue("powerCompany", "tokyo-electric");
+        result.current.form.setValue("plan", "tokyo-juryou-b");
+      });
+
+      await waitFor(() => {
+        expect(result.current.isDetailsSectionVisible).toBe(true);
+      });
     });
   });
 });
