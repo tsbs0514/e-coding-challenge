@@ -20,7 +20,7 @@ export function usePlan(
   watchedPlan: ElectricPlan | ""
 ) {
   const getAvailablePlans = useCallback(() => {
-    if (!watchedPowerCompany) return [];
+    if (!watchedPowerCompany || watchedPowerCompany === "other") return [];
     return watchedPowerCompany === "tokyo-electric"
       ? TOKYO_PLANS
       : KANSAI_PLANS;
